@@ -17,6 +17,9 @@
 #include <atomic>
 #endif
 
+
+
+
 using namespace std;
 
 class Worker {
@@ -24,13 +27,14 @@ public:
     Worker();
 
 
-    Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests);
+    Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests, u_short netflow_version);
 
     void Run();
 
 private:
     char *dest_;
     u_short port_;
+    u_short netflow_version_;
     std::mutex *mtx_;
     std::atomic_ulong *requests_;
 

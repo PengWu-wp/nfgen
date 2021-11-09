@@ -9,10 +9,13 @@ using namespace std;
 u_int _NUM_THREADS = 3;
 u_short _NF_PORT = 9995;
 
+
+
 int main(int argc, char *argv[]) {
 
     u_int num_threads_ = _NUM_THREADS;
     u_short port_ = _NF_PORT;
+    u_short netflow_version_ = 9;
     char *dest_;
 
     mutex mtx_;
@@ -21,14 +24,14 @@ int main(int argc, char *argv[]) {
     // handle options
     if (argc < 2) {
         cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
-             << ")] target_ip" << endl;
+             << ")] [-v netflow_version (9)] target_ip" << endl;
         return -1;
     }
 
     int opt;
     char *endptr;
 
-    while ((opt = getopt(argc, argv, "t:p:")) != EOF) {
+    while ((opt = getopt(argc, argv, "t:p:hv:")) != EOF) {
         switch (opt) {
             case 't':
                 num_threads_ = (u_int) strtol(optarg, &endptr, 0);
@@ -44,9 +47,16 @@ int main(int argc, char *argv[]) {
                     return EXIT_FAILURE;
                 }
                 break;
+            case 'h':
+                cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
+                     << ")] [-v netflow_version (9)] target_ip" << endl;
+                return EXIT_SUCCESS;
+            case 'v':
+                netflow_version_ = (u_int) strtol(optarg, &endptr, 0);
+                break;
             default:
                 cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
-                     << ")] target_ip" << endl;
+                     << ")] [-v netflow_version (9)] target_ip" << endl;
                 return EXIT_FAILURE;
         }
     }
@@ -58,12 +68,17 @@ int main(int argc, char *argv[]) {
         dest_ = argv[optind];
     }
 
+    if (netflow_version_ != 5 && netflow_version_ != 9) {
+        cout << "Error: netflow_version(" << netflow_version_ << ") is wrong." << endl;
+        return EXIT_FAILURE;
+    }
+
     // create worker threads
     thread *thWorker;
     thWorker = new thread[num_threads_];
 
     for (u_int i = 0; i < num_threads_; i++) {
-        thWorker[i] = thread(&Worker::Run, Worker(dest_, port_, &mtx_, &requests_));
+        thWorker[i] = thread(&Worker::Run, Worker(dest_, port_, &mtx_, &requests_, netflow_version_));
     }
 
     // timer thread
