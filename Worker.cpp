@@ -124,10 +124,10 @@ void Worker::Run() {
     }
 
     addr.sin_family = AF_INET;
-    addr.sin_port = htons ((short) (size_t) port_);
+    addr.sin_port = htons((short) (size_t) port_);
     addr.sin_addr.s_addr = inet_addr(dest_);
 
-    switch(netflow_version_){
+    switch (netflow_version_) {
         case 5:
             while (true) {
                 if (sendto(sd, &cflow_cap_5, sizeof(cflow_cap_5), 0,
@@ -136,6 +136,7 @@ void Worker::Run() {
                     exit(EXIT_FAILURE);
                 }
                 requests_->fetch_add(1);
+                for (int i = 0; i < count_; i++) {}
             }
         case 9:
             while (true) {
@@ -145,6 +146,7 @@ void Worker::Run() {
                     exit(EXIT_FAILURE);
                 }
                 requests_->fetch_add(1);
+                for (int i = 0; i < count_; i++) {}
             }
         default:
             safe_cout("Error: netflow version not specified.");
@@ -152,15 +154,21 @@ void Worker::Run() {
     }
 
 
-
     close(sd);
 
 }
 
-Worker::Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests, u_short netflow_version) : dest_(dest), port_(port),
-                                                                               mtx_(mtx), requests_(requests), netflow_version_(netflow_version) {}
+Worker::Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests, u_short netflow_version, int count) : dest_(
+        dest),
+                                                                                                               port_(port),
+                                                                                                               mtx_(mtx),
+                                                                                                               requests_(
+                                                                                                                       requests),
+                                                                                                               netflow_version_(
+                                                                                                                       netflow_version),
+                                                                                                               count_(count) {}
 
 void Worker::safe_cout(const string &msg) {
-    lock_guard<mutex> lock(*mtx_);
+    lock_guard <mutex> lock(*mtx_);
     cout << msg;
 }

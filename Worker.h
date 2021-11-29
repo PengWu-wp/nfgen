@@ -27,7 +27,7 @@ public:
     Worker();
 
 
-    Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests, u_short netflow_version);
+    Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests, u_short netflow_version, int count);
 
     void Run();
 
@@ -35,6 +35,7 @@ private:
     char *dest_;
     u_short port_;
     u_short netflow_version_;
+    int count_;
     std::mutex *mtx_;
     std::atomic_ulong *requests_;
 

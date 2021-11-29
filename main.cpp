@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
     u_int num_threads_ = _NUM_THREADS;
     u_short port_ = _NF_PORT;
     u_short netflow_version_ = 9;
+    int count_ = 0;
     char *dest_;
 
     mutex mtx_;
@@ -24,14 +25,14 @@ int main(int argc, char *argv[]) {
     // handle options
     if (argc < 2) {
         cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
-             << ")] [-v netflow_version (9)] target_ip" << endl;
+             << ")] [-v netflow_version (9)] [-c count (0)] target_ip" << endl;
         return -1;
     }
 
     int opt;
     char *endptr;
 
-    while ((opt = getopt(argc, argv, "t:p:hv:")) != EOF) {
+    while ((opt = getopt(argc, argv, "t:p:hv:c:")) != EOF) {
         switch (opt) {
             case 't':
                 num_threads_ = (u_int) strtol(optarg, &endptr, 0);
@@ -54,9 +55,12 @@ int main(int argc, char *argv[]) {
             case 'v':
                 netflow_version_ = (u_int) strtol(optarg, &endptr, 0);
                 break;
+            case 'c':
+                count_ = (u_int) strtol(optarg, &endptr, 0);
+                break;
             default:
                 cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
-                     << ")] [-v netflow_version (9)] target_ip" << endl;
+                     << ")] [-v netflow_version (9)] [-c count (0)] target_ip" << endl;
                 return EXIT_FAILURE;
         }
     }
@@ -78,7 +82,7 @@ int main(int argc, char *argv[]) {
     thWorker = new thread[num_threads_];
 
     for (u_int i = 0; i < num_threads_; i++) {
-        thWorker[i] = thread(&Worker::Run, Worker(dest_, port_, &mtx_, &requests_, netflow_version_));
+        thWorker[i] = thread(&Worker::Run, Worker(dest_, port_, &mtx_, &requests_, netflow_version_,count_));
     }
 
     // timer thread
