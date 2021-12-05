@@ -10,7 +10,6 @@ u_int _NUM_THREADS = 3;
 u_short _NF_PORT = 9995;
 
 
-
 int main(int argc, char *argv[]) {
 
     u_int num_threads_ = _NUM_THREADS;
@@ -72,7 +71,8 @@ int main(int argc, char *argv[]) {
         dest_ = argv[optind];
     }
 
-    if (netflow_version_ != 5 && netflow_version_ != 9&& netflow_version_ != 10&& netflow_version_ != 6) {
+    if (netflow_version_ != 5 && netflow_version_ != 9 && netflow_version_ != 10 && netflow_version_ != 6 &&
+        netflow_version_ != 8) {
         cout << "Error: netflow_version(" << netflow_version_ << ") is wrong." << endl;
         return EXIT_FAILURE;
     }
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     thWorker = new thread[num_threads_];
 
     for (u_int i = 0; i < num_threads_; i++) {
-        thWorker[i] = thread(&Worker::Run, Worker(dest_, port_, &mtx_, &requests_, netflow_version_,count_));
+        thWorker[i] = thread(&Worker::Run, Worker(dest_, port_, &mtx_, &requests_, netflow_version_, count_));
     }
 
     // timer thread
