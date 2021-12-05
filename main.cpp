@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
         dest_ = argv[optind];
     }
 
-    if (netflow_version_ != 5 && netflow_version_ != 9) {
+    if (netflow_version_ != 5 && netflow_version_ != 9&& netflow_version_ != 10&& netflow_version_ != 6) {
         cout << "Error: netflow_version(" << netflow_version_ << ") is wrong." << endl;
         return EXIT_FAILURE;
     }

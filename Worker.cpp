@@ -113,6 +113,25 @@ unsigned char cflow_cap_5[] = {
 };
 
 
+unsigned char cflow_cap_5_small[] = {
+        0x00, 0x05,
+        0x00, 0x01, 0x00, 0x60, 0x11, 0xe1, 0x61, 0xac, 0x65, 0x2f, 0x2e, 0x20, 0xf5, 0xc0, 0x00, 0x0b,
+        0xe1, 0x9c, 0x01, 0x01, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x4f, 0x14, 0x00, 0x00, 0x67, 0x1e, 0x00, 0x00, 0xfe,
+        0x00, 0x01, 0x00, 0x02, 0x00, 0x00, 0x01, 0xdd, 0x00, 0x02, 0x2b, 0x4c, 0x00, 0x60, 0x11, 0x91, 0x00, 0x60,
+        0x11, 0xe1, 0x06, 0x74, 0x0e, 0x44, 0x00, 0x1b, 0x06, 0x00, 0x00, 0x66, 0x00, 0xca, 0x18, 0x18, 0x00, 0x00
+};
+
+unsigned char cflow_cap_IPFIX[] = {
+        0x00, 0x0a, 0x00, 0x72, 0x61, 0xac, 0x68, 0x19, 0x00, 0x00, 0x16, 0xa3, 0x00, 0x00, 0x00, 0x00, 0x01, 0x06,
+        0x00, 0x62, 0x00, 0x00, 0x0b, 0xb8, 0x00, 0x00, 0x00, 0x0a, 0x11, 0x00, 0x22, 0x34, 0x06, 0x43, 0x0a, 0x01,
+        0x01, 0xa4, 0x14, 0x01, 0x01, 0x56, 0x00, 0x01, 0x00, 0x04, 0x00, 0x00, 0x0a, 0x01, 0x00, 0x00, 0x14, 0x01,
+        0x00, 0x01, 0x01, 0x01, 0x02, 0x04, 0xb4, 0xbe, 0x3b, 0x04, 0xb4, 0xbf, 0x67, 0x00, 0x00, 0x0b, 0xb8, 0x00,
+        0x00, 0x00, 0x0a, 0x11, 0x00, 0x18, 0x34, 0x14, 0x5b, 0x0a, 0x01, 0x01, 0x59, 0x14, 0x01, 0x01, 0x7f, 0x00,
+        0x06, 0x00, 0x05, 0x00, 0x00, 0x0a, 0x01, 0x00, 0x00, 0x14, 0x01, 0x00, 0x01, 0x01, 0x01, 0x02, 0x04, 0xb4,
+        0xbe, 0x3b, 0x04, 0xb4, 0xbf, 0x67
+};
+
+
 void Worker::Run() {
 
     int sd;
@@ -138,9 +157,29 @@ void Worker::Run() {
                 requests_->fetch_add(1);
                 for (int i = 0; i < count_; i++) {}
             }
+        case 6:
+            while (true) {
+                if (sendto(sd, &cflow_cap_5_small, sizeof(cflow_cap_5_small), 0,
+                           (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+                    safe_cout("Error: Sent failed.");
+                    exit(EXIT_FAILURE);
+                }
+                requests_->fetch_add(1);
+                for (int i = 0; i < count_; i++) {}
+            }
         case 9:
             while (true) {
                 if (sendto(sd, &cflow_cap, sizeof(cflow_cap), 0,
+                           (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+                    safe_cout("Error: Sent failed.");
+                    exit(EXIT_FAILURE);
+                }
+                requests_->fetch_add(1);
+                for (int i = 0; i < count_; i++) {}
+            }
+        case 10:
+            while (true) {
+                if (sendto(sd, &cflow_cap_IPFIX, sizeof(cflow_cap_IPFIX), 0,
                            (struct sockaddr *) &addr, sizeof(addr)) < 0) {
                     safe_cout("Error: Sent failed.");
                     exit(EXIT_FAILURE);
@@ -158,15 +197,16 @@ void Worker::Run() {
 
 }
 
-Worker::Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests, u_short netflow_version, int count) : dest_(
+Worker::Worker(char *dest, u_short port, mutex *mtx, atomic_ulong *requests, u_short netflow_version, int count)
+        : dest_(
         dest),
-                                                                                                               port_(port),
-                                                                                                               mtx_(mtx),
-                                                                                                               requests_(
-                                                                                                                       requests),
-                                                                                                               netflow_version_(
-                                                                                                                       netflow_version),
-                                                                                                               count_(count) {}
+          port_(port),
+          mtx_(mtx),
+          requests_(
+                  requests),
+          netflow_version_(
+                  netflow_version),
+          count_(count) {}
 
 void Worker::safe_cout(const string &msg) {
     lock_guard <mutex> lock(*mtx_);
