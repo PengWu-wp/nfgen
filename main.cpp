@@ -9,6 +9,23 @@ using namespace std;
 u_int _NUM_THREADS = 3;
 u_short _NF_PORT = 9995;
 
+static void usage(char *name) {
+    printf("usage %s [options] <target_ip>\n"
+           "\n"
+           "Options:\n"
+           "-h                 this text you see right here\n"
+           "-t <num_threads>   Number of threads to generate the traffic (default 3)\n"
+           "-p <port>          Target port number (default 9995)\n"
+           "-c <count>         My way to keep frequency...\n"
+           "-v <version>       Packet version  (default 9, netflow v9)\n"
+           "                   5 for netflow v5\n"
+           "                   6 for netflow v5(small)\n"
+           "                   8 for netflow v9(small)\n"
+           "                   9 for netflow v9\n"
+           "                   10 for IPFIX\n"
+            , name);
+} // End of usage
+
 
 int main(int argc, char *argv[]) {
 
@@ -23,8 +40,7 @@ int main(int argc, char *argv[]) {
 
     // handle options
     if (argc < 2) {
-        cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
-             << ")] [-v netflow_version (9)] [-c count (0)] target_ip" << endl;
+        usage(argv[0]);
         return -1;
     }
 
@@ -48,8 +64,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case 'h':
-                cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
-                     << ")] [-v netflow_version (9)] target_ip" << endl;
+                usage(argv[0]);
                 return EXIT_SUCCESS;
             case 'v':
                 netflow_version_ = (u_int) strtol(optarg, &endptr, 0);
@@ -58,8 +73,7 @@ int main(int argc, char *argv[]) {
                 count_ = (u_int) strtol(optarg, &endptr, 0);
                 break;
             default:
-                cout << "Usage: " << argv[0] << " [-t num_threads (" << _NUM_THREADS << ")] [-p port (" << _NF_PORT
-                     << ")] [-v netflow_version (9)] [-c count (0)] target_ip" << endl;
+                usage(argv[0]);
                 return EXIT_FAILURE;
         }
     }
