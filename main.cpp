@@ -23,6 +23,7 @@ static void usage(char *name) {
            "                   8 for netflow v9(small)\n"
            "                   9 for netflow v9\n"
            "                   10 for IPFIX\n"
+           "                   1 for memcached get test\n"
             , name);
 } // End of usage
 
@@ -85,8 +86,8 @@ int main(int argc, char *argv[]) {
         dest_ = argv[optind];
     }
 
-    if (netflow_version_ != 5 && netflow_version_ != 9 && netflow_version_ != 10 && netflow_version_ != 6 &&
-        netflow_version_ != 8) {
+    if (netflow_version_ != 5 && netflow_version_ != 9 && netflow_version_ != 10 &&
+        netflow_version_ != 6 && netflow_version_ != 8 && netflow_version_ != 1) {
         cout << "Error: netflow_version(" << netflow_version_ << ") is wrong." << endl;
         return EXIT_FAILURE;
     }

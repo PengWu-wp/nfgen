@@ -140,7 +140,12 @@ unsigned char cflow_cap_IPFIX[] = {
         0x06, 0x00, 0x05, 0x00, 0x00, 0x0a, 0x01, 0x00, 0x00, 0x14, 0x01, 0x00, 0x01, 0x01, 0x01, 0x02, 0x04, 0xb4,
         0xbe, 0x3b, 0x04, 0xb4, 0xbf, 0x67
 };
-
+unsigned char memcached_cap_get[] = {
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x67, 0x65, 0x74, 0x20,
+        0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32,
+//        0x77, 0x75, 0x70, 0x65, 0x6e, 0x67,
+        0x0d, 0x0a
+};
 
 void Worker::Run() {
 
@@ -200,6 +205,16 @@ void Worker::Run() {
         case 10:
             while (true) {
                 if (sendto(sd, &cflow_cap_IPFIX, sizeof(cflow_cap_IPFIX), 0,
+                           (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+                    safe_cout("Error: Sent failed.");
+                    exit(EXIT_FAILURE);
+                }
+                requests_->fetch_add(1);
+                for (int i = 0; i < count_; i++) {}
+            }
+        case 1:
+            while (true) {
+                if (sendto(sd, &memcached_cap_get, sizeof(memcached_cap_get), 0,
                            (struct sockaddr *) &addr, sizeof(addr)) < 0) {
                     safe_cout("Error: Sent failed.");
                     exit(EXIT_FAILURE);
